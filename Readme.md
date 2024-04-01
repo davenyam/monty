@@ -1,3 +1,3 @@
 read me file goes here
 
-re
+0x19. C - Stacks, Queues - LIFO, FIFO
