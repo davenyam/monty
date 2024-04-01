@@ -1,12 +1,56 @@
 #include "monty.h"
+
 bus_t bus = {NULL, NULL, NULL, 0};
+
+/* custom_getline - custom implementation of getline function */
+ssize_t custom_getline(lineptr, n, stream)
+char **lineptr;
+size_t *n;
+FILE *stream;
+{
+	size_t capacity = *n;
+	size_t i = 0;
+	int c;
+	char *tmp;
+
+	if (*lineptr == NULL)
+	{
+		*lineptr = malloc(capacity);
+		if (*lineptr == NULL)
+		{
+			return -1;
+		}
+	}
+
+	while ((c = fgetc(stream)) != EOF && c != '\n')
+	{
+		if (i + 1 >= capacity)
+		{
+			capacity *= 2;
+			tmp = realloc(*lineptr, capacity);
+			if (tmp == NULL)
+			{
+				return -1;
+			}
+			*lineptr = tmp;
+		}
+		(*lineptr)[i++] = c;
+	}
+
+	(*lineptr)[i] = '\0';
+	*n = capacity;
+	return i;
+}
+
 /**
  * main - monty code interpreter
  * @argc: number of arguments
  * @argv: monty file location
  * Return: 0 on success
  */
-int main(int argc, char *argv[])
+int main(argc, argv)
+int argc;
+char *argv[];
 {
 	char *content;
 	FILE *file;
@@ -30,7 +74,7 @@ int main(int argc, char *argv[])
 	while (read_line > 0)
 	{
 		content = NULL;
-		read_line = getline(&content, &size, file);
+		read_line = custom_getline(&content, &size, file);
 		bus.content = content;
 		counter++;
 		if (read_line > 0)
